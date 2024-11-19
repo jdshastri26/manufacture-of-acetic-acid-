@@ -1,0 +1,99 @@
+# acetic_acid_manufacture.py
+
+class AceticAcidManufacture:
+    def __init__(self, methanol_feed: float, carbon_monoxide_feed: float, catalyst_efficiency: float, reaction_time: float, reaction_temperature: float):
+        """
+        Initialize the acetic acid manufacturing parameters.
+        
+        :param methanol_feed: Methanol feed rate (kg/hour)
+        :param carbon_monoxide_feed: Carbon monoxide feed rate (kg/hour)
+        :param catalyst_efficiency: Catalyst efficiency (%)
+        :param reaction_time: Reaction time (hours)
+        :param reaction_temperature: Reaction temperature (°C)
+        """
+        self.methanol_feed = methanol_feed
+        self.carbon_monoxide_feed = carbon_monoxide_feed
+        self.catalyst_efficiency = catalyst_efficiency
+        self.reaction_time = reaction_time
+        self.reaction_temperature = reaction_temperature
+        self.acetic_acid_production = 0.0
+
+    def validate_inputs(self):
+        """
+        Validates inputs to ensure realistic and non-negative values.
+        """
+        if self.methanol_feed <= 0 or self.carbon_monoxide_feed <= 0:
+            raise ValueError("Feed rates must be greater than 0.")
+        if not (0 < self.catalyst_efficiency <= 100):
+            raise ValueError("Catalyst efficiency must be between 0 and 100%.")
+        if self.reaction_time <= 0:
+            raise ValueError("Reaction time must be greater than 0.")
+        if not (20 <= self.reaction_temperature <= 300):
+            raise ValueError("Reaction temperature must be between 20°C and 300°C.")
+
+    def simulate_reaction(self):
+        """
+        Simulates the reaction to produce acetic acid.
+        
+        :return: Acetic acid production and unreacted feed
+        """
+        print("Simulating acetic acid production...")
+        
+        # Limiting reactant is methanol
+        methanol_to_acetic_acid = self.methanol_feed * (self.catalyst_efficiency / 100)
+
+        # Ensure sufficient carbon monoxide for the reaction
+        if self.carbon_monoxide_feed < methanol_to_acetic_acid:
+            methanol_to_acetic_acid = self.carbon_monoxide_feed  # Adjust for limiting CO
+        
+        # Calculate unreacted components
+        unreacted_methanol = self.methanol_feed - methanol_to_acetic_acid
+        unreacted_carbon_monoxide = self.carbon_monoxide_feed - methanol_to_acetic_acid
+        
+        # Acetic acid produced
+        acetic_acid = methanol_to_acetic_acid
+        self.acetic_acid_production = acetic_acid
+        
+        print(f"Acetic acid produced: {acetic_acid:.2f} kg/hour")
+        print(f"Unreacted Methanol: {unreacted_methanol:.2f} kg/hour")
+        print(f"Unreacted Carbon Monoxide: {unreacted_carbon_monoxide:.2f} kg/hour")
+        
+        return {
+            "acetic_acid": acetic_acid,
+            "unreacted_methanol": unreacted_methanol,
+            "unreacted_carbon_monoxide": unreacted_carbon_monoxide,
+        }
+
+    def process(self):
+        """
+        Full manufacturing process for acetic acid.
+        """
+        self.validate_inputs()
+        return self.simulate_reaction()
+
+
+if __name__ == "__main__":
+    # Example input values for the process
+    methanol_feed = 100.0  # kg/hour
+    carbon_monoxide_feed = 120.0  # kg/hour
+    catalyst_efficiency = 85.0  # %
+    reaction_time = 2.0  # hours
+    reaction_temperature = 250.0  # °C
+
+    # Initialize the manufacturing process
+    acetic_acid_manufacture = AceticAcidManufacture(
+        methanol_feed=methanol_feed,
+        carbon_monoxide_feed=carbon_monoxide_feed,
+        catalyst_efficiency=catalyst_efficiency,
+        reaction_time=reaction_time,
+        reaction_temperature=reaction_temperature
+    )
+    
+    # Run the process and capture results
+    results = acetic_acid_manufacture.process()
+
+    # Display results
+    print("\nFinal Results:")
+    print(f"Acetic Acid Produced: {results['acetic_acid']:.2f} kg/hour")
+    print(f"Unreacted Methanol: {results['unreacted_methanol']:.2f} kg/hour")
+    print(f"Unreacted Carbon Monoxide: {results['unreacted_carbon_monoxide']:.2f} kg/hour")
